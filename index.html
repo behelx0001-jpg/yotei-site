@@ -1,21 +1,70 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Yotei - Нерухомість</title>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yotei Нерухомість</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Yotei - Нерухомість</h1>
-    <p>Оберіть свій фільтр:</p>
 
-    <select id="roleFilter">
-        <option value="buyer">Покупець</option>
-        <option value="seller">Продавець</option>
-        <option value="landlord">Орендодавець</option>
-        <option value="tenant">Орендар</option>
-    </select>
+<div class="container">
+    <h1>Пошук нерухомості</h1>
 
+    <div class="filter-box">
+
+        <div class="filter-group">
+            <label>Тип операції</label>
+            <select>
+                <option>Купити</option>
+                <option>Орендувати</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Тип нерухомості</label>
+            <select>
+                <option>Квартира</option>
+                <option>Будинок</option>
+                <option>Комерційна</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Місто</label>
+            <input type="text" placeholder="Введіть місто">
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Ціна від ($)</label>
+                <input type="number" placeholder="10000">
+            </div>
+
+            <div class="filter-group">
+                <label>Ціна до ($)</label>
+                <input type="number" placeholder="500000">
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Кімнат від</label>
+                <input type="number" placeholder="1">
+            </div>
+
+            <div class="filter-group">
+                <label>Кімнат до</label>
+                <input type="number" placeholder="5">
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label>Площа (м²)</label>
+            <input type="number" placeholder="Від 30">
+        </div>
+
+        <button class="search-btn">Знайти</button>
     <div id="results"></div>
 
     <script src="script.js"></script>
