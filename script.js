@@ -1,4 +1,13 @@
+const operation = document.getElementById("operation").value;
+const type = document.getElementById("type").value;
+const city = document.getElementById("city").value.toLowerCase();
+const priceFrom = document.getElementById("priceFrom").value;
+const priceTo = document.getElementById("priceTo").value;
+const roomsFrom = document.getElementById("roomsFrom").value;
+const roomsTo = document.getElementById("roomsTo").value;
+const area = document.getElementById("area").value;
 const resultsDiv = document.getElementById("results");
+
 const roleFilter = document.getElementById("roleFilter");
 
 const listings = [
@@ -97,3 +106,4 @@ document.querySelector(".search-btn").addEventListener("click", function () {
         `;
     });
 });
+
