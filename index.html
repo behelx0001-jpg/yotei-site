@@ -1,1 +1,667 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Yotei — Нерухомість</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f7f5f0;
+    --cream: #ede9e0;
+    --accent: #c9a84c;
+    --accent2: #2d6a4f;
+    --muted: #7a7570;
+    --card-bg: #ffffff;
+    --border: rgba(15,14,12,.1);
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(15,14,12,.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--ink);
+    padding: 18px 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: #fff; font-weight: 400; font-size: 13px; display: block; margin-top: 1px; letter-spacing: 0.5px; }
+
+  /* ── STEPS ── */
+  .steps-bar {
+    display: flex;
+    gap: 6px;
+    padding: 16px 20px 0;
+  }
+  .step-dot {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--cream);
+    transition: background .3s;
+  }
+  .step-dot.active { background: var(--accent); }
+  .step-dot.done { background: var(--accent2); }
+
+  /* ── SCREENS ── */
+  .screen {
+    display: none;
+    padding: 24px 20px 100px;
+    animation: fadeUp .3s ease;
+  }
+  .screen.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .screen-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* ── OPTION CHIPS ── */
+  .chip-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .chip-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+  .chip {
+    border: 1.5px solid var(--border);
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+    user-select: none;
+  }
+  .chip .chip-icon { font-size: 24px; display: block; margin-bottom: 6px; }
+  .chip .chip-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .chip .chip-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .chip.selected {
+    border-color: var(--accent);
+    background: #fdf8ec;
+  }
+  .chip.selected .chip-label { color: var(--accent); }
+
+  /* ── INPUTS ── */
+  .field-group { margin-bottom: 20px; }
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+  input[type=text], input[type=number], select {
+    width: 100%;
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    transition: border .2s;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+
+  .price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ── RANGE SLIDER ── */
+  .range-wrap { position: relative; padding: 8px 0; }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--cream);
+    border-radius: 2px;
+    outline: none;
+    border: none;
+    padding: 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(201,168,76,.4);
+  }
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .range-val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  /* ── RESULTS / CARDS ── */
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .results-count {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .filter-tag {
+    background: var(--cream);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  /* ── PROPERTY CARD ── */
+  .prop-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    animation: fadeUp .3s ease both;
+  }
+  .prop-card:active { transform: scale(.98); }
+  .prop-card:hover { box-shadow: 0 8px 32px rgba(15,14,12,.12); }
+  .prop-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    background: var(--cream);
+  }
+  .prop-img-placeholder {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, var(--cream) 0%, #e8e2d4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+  }
+  .prop-body { padding: 16px; }
+  .prop-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .prop-price span { font-size: 13px; font-weight: 400; color: var(--muted); }
+  .prop-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .prop-location {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .prop-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .prop-tag {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .prop-tag.gold {
+    background: #fdf8ec;
+    color: var(--accent);
+  }
+
+  /* ── SEND BUTTON ── */
+  .btn-send {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+    background: var(--paper);
+    border-top: 1px solid var(--border);
+    z-index: 200;
+  }
+  .btn-primary {
+    width: 100%;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:active { transform: scale(.98); opacity: .9; }
+  .btn-primary.accent { background: var(--accent); color: var(--ink); }
+  .btn-primary:disabled { opacity: .4; }
+
+  /* ── EMPTY ── */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-title { font-family: 'Unbounded', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .empty-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* ── SKELETON ── */
+  .skeleton {
+    background: linear-gradient(90deg, var(--cream) 25%, var(--paper) 50%, var(--cream) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">YOTEI<span>нерухомість</span></div>
+  </div>
+</div>
+
+<div class="steps-bar" id="stepsBar">
+  <div class="step-dot active" id="dot0"></div>
+  <div class="step-dot" id="dot1"></div>
+  <div class="step-dot" id="dot2"></div>
+  <div class="step-dot" id="dot3"></div>
+  <div class="step-dot" id="dot4"></div>
+</div>
+
+<!-- SCREEN 0: Тип нерухомості -->
+<div class="screen active" id="screen0">
+  <p class="screen-title">Що шукаєте?</p>
+  <p class="screen-sub">Оберіть тип нерухомості</p>
+  <div class="chip-grid">
+    <div class="chip" data-value="apartment" onclick="selectType(this)">
+      <span class="chip-icon">🏢</span>
+      <div class="chip-label">Квартира</div>
+    </div>
+    <div class="chip" data-value="house" onclick="selectType(this)">
+      <span class="chip-icon">🏠</span>
+      <div class="chip-label">Будинок</div>
+    </div>
+    <div class="chip" data-value="land" onclick="selectType(this)">
+      <span class="chip-icon">🌿</span>
+      <div class="chip-label">Ділянка</div>
+    </div>
+    <div class="chip" data-value="commercial" onclick="selectType(this)">
+      <span class="chip-icon">🏪</span>
+      <div class="chip-label">Комерція</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 1: Місто -->
+<div class="screen" id="screen1">
+  <p class="screen-title">Яке місто?</p>
+  <p class="screen-sub">Введіть назву міста або оберіть</p>
+  <div class="field-group">
+    <input type="text" id="cityInput" placeholder="Наприклад: Харків" oninput="updateCity(this.value)">
+  </div>
+  <div class="chip-grid cols3">
+    <div class="chip" onclick="setCity('Харків')"><div class="chip-label">Харків</div></div>
+    <div class="chip" onclick="setCity('Київ')"><div class="chip-label">Київ</div></div>
+    <div class="chip" onclick="setCity('Одеса')"><div class="chip-label">Одеса</div></div>
+    <div class="chip" onclick="setCity('Львів')"><div class="chip-label">Львів</div></div>
+    <div class="chip" onclick="setCity('Дніпро')"><div class="chip-label">Дніпро</div></div>
+    <div class="chip" onclick="setCity('Запоріжжя')"><div class="chip-label">Запоріжжя</div></div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Бюджет -->
+<div class="screen" id="screen2">
+  <p class="screen-title">Ваш бюджет</p>
+  <p class="screen-sub">Вкажіть максимальну суму</p>
+  <div class="range-val" id="budgetVal">до 100 000 $</div>
+  <div class="range-wrap">
+    <input type="range" min="5000" max="500000" step="5000" value="100000"
+           id="budgetRange" oninput="updateBudget(this.value)">
+    <div class="range-labels"><span>5 000 $</span><span>500 000 $</span></div>
+  </div>
+  <div class="field-group" style="margin-top:24px">
+    <label class="field-label">Або введіть точну суму</label>
+    <div class="price-row">
+      <input type="number" id="priceMin" placeholder="Від $" oninput="updateFilters()">
+      <input type="number" id="priceMax" placeholder="До $" oninput="syncRange(this.value)">
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: Параметри -->
+<div class="screen" id="screen3">
+  <p class="screen-title">Параметри</p>
+  <p class="screen-sub">Уточніть деталі (необов'язково)</p>
+
+  <div class="field-group">
+    <label class="field-label">Кімнат</label>
+    <div class="chip-grid cols3" id="roomsGrid" style="margin-bottom:0">
+      <div class="chip" data-value="1" onclick="selectRooms(this)"><div class="chip-label">1</div></div>
+      <div class="chip" data-value="2" onclick="selectRooms(this)"><div class="chip-label">2</div></div>
+      <div class="chip" data-value="3" onclick="selectRooms(this)"><div class="chip-label">3+</div></div>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">Мінімальна площа (м²)</label>
+    <input type="number" id="areaMin" placeholder="Наприклад: 50" oninput="updateFilters()">
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">Стан</label>
+    <select id="conditionSelect" onchange="updateFilters()">
+      <option value="">Будь-який</option>
+      <option value="Новобудова">Новобудова</option>
+      <option value="Євроремонт">Євроремонт</option>
+      <option value="Хороший">Хороший стан</option>
+      <option value="Потребує ремонту">Потребує ремонту</option>
+    </select>
+  </div>
+</div>
+
+<!-- SCREEN 4: Результати -->
+<div class="screen" id="screen4">
+  <div class="results-header">
+    <div class="results-count" id="resultsCount">Шукаємо...</div>
+    <div class="filter-tag" id="filterTag"></div>
+  </div>
+  <div id="propList"></div>
+</div>
+
+<!-- Кнопка дії -->
+<div class="btn-send">
+  <button class="btn-primary" id="mainBtn" onclick="nextStep()">Далі →</button>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.expand(); tg.ready(); }
+
+// ── Стан ──────────────────────────────────────────────────
+let state = {
+  step: 0,
+  type: '',
+  city: '',
+  price_min: null,
+  price_max: 100000,
+  rooms: null,
+  area_min: null,
+  condition: '',
+};
+let properties = [];
+
+// ── Навігація ─────────────────────────────────────────────
+function goTo(step) {
+  document.querySelectorAll('.screen').forEach((s,i) => s.classList.toggle('active', i===step));
+  document.querySelectorAll('.step-dot').forEach((d,i) => {
+    d.classList.toggle('active', i===step);
+    d.classList.toggle('done', i<step);
+  });
+  state.step = step;
+  updateBtn();
+}
+
+function nextStep() {
+  const s = state.step;
+  if (s === 0 && !state.type) return shake();
+  if (s === 1 && !state.city) return shake();
+  if (s === 3) { loadResults(); goTo(4); return; }
+  if (s === 4) { sendToBot(); return; }
+  goTo(s + 1);
+}
+
+function updateBtn() {
+  const btn = document.getElementById('mainBtn');
+  const labels = ['Далі →', 'Далі →', 'Далі →', 'Показати об\'єкти 🔍', 'Надіслати в бот ✓'];
+  btn.textContent = labels[state.step];
+  if (state.step === 4) btn.classList.add('accent');
+  else btn.classList.remove('accent');
+}
+
+function shake() {
+  const btn = document.getElementById('mainBtn');
+  btn.style.transform = 'translateX(-8px)';
+  setTimeout(() => btn.style.transform = 'translateX(8px)', 80);
+  setTimeout(() => btn.style.transform = '', 160);
+}
+
+// ── Вибір типу ────────────────────────────────────────────
+function selectType(el) {
+  document.querySelectorAll('#screen0 .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.type = el.dataset.value;
+}
+
+// ── Місто ─────────────────────────────────────────────────
+function setCity(city) {
+  state.city = city;
+  document.getElementById('cityInput').value = city;
+  document.querySelectorAll('#screen1 .chip').forEach(c => {
+    c.classList.toggle('selected', c.querySelector('.chip-label')?.textContent === city);
+  });
+}
+function updateCity(v) { state.city = v; }
+
+// ── Бюджет ────────────────────────────────────────────────
+function updateBudget(v) {
+  state.price_max = parseInt(v);
+  document.getElementById('budgetVal').textContent = `до ${formatNum(v)} $`;
+  document.getElementById('priceMax').value = v;
+}
+function syncRange(v) {
+  state.price_max = parseInt(v) || 100000;
+  document.getElementById('budgetRange').value = state.price_max;
+  document.getElementById('budgetVal').textContent = `до ${formatNum(state.price_max)} $`;
+}
+
+// ── Кімнати ───────────────────────────────────────────────
+function selectRooms(el) {
+  document.querySelectorAll('#roomsGrid .chip').forEach(c => c.classList.remove('selected'));
+  if (state.rooms == el.dataset.value) { state.rooms = null; return; }
+  el.classList.add('selected');
+  state.rooms = el.dataset.value;
+}
+
+function updateFilters() {
+  state.price_min = parseInt(document.getElementById('priceMin').value) || null;
+  state.area_min = parseFloat(document.getElementById('areaMin').value) || null;
+  state.condition = document.getElementById('conditionSelect').value;
+}
+
+// ── Завантаження об'єктів ─────────────────────────────────
+async function loadResults() {
+  const list = document.getElementById('propList');
+  list.innerHTML = renderSkeletons(3);
+  document.getElementById('resultsCount').textContent = 'Шукаємо...';
+
+  try {
+    const params = new URLSearchParams();
+    if (state.type && state.type !== 'all') params.set('type', state.type);
+    if (state.city) params.set('city', state.city);
+    if (state.price_min) params.set('price_min', state.price_min);
+    if (state.price_max) params.set('price_max', state.price_max);
+    if (state.rooms) params.set('rooms', state.rooms);
+
+    const API = window.YOTEI_API || 'http://localhost:8000';
+    const res = await fetch(`${API}/public/properties?${params}`);
+    properties = await res.json();
+  } catch(e) {
+    properties = getDemoProps();
+  }
+
+  renderResults();
+}
+
+function renderResults() {
+  const list = document.getElementById('propList');
+  const count = document.getElementById('resultsCount');
+  const tag = document.getElementById('filterTag');
+
+  count.textContent = `Знайдено: ${properties.length}`;
+  tag.textContent = typeLabel(state.type);
+
+  if (!properties.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">Нічого не знайдено</div>
+        <div class="empty-sub">Спробуйте змінити параметри пошуку</div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = properties.map((p, i) => `
+    <div class="prop-card" style="animation-delay:${i*60}ms">
+      ${p.photo
+        ? `<img class="prop-img" src="${p.photo}" alt="${p.title}" loading="lazy">`
+        : `<div class="prop-img-placeholder">${typeEmoji(p.type)}</div>`}
+      <div class="prop-body">
+        <div class="prop-price">${formatNum(p.price)} $ <span>~ ${formatNum(Math.round(p.price/p.area||0))}/м²</span></div>
+        <div class="prop-title">${p.title}</div>
+        <div class="prop-location">📍 ${p.city}${p.district ? ', '+p.district : ''}</div>
+        <div class="prop-tags">
+          ${p.area ? `<span class="prop-tag">📐 ${p.area} м²</span>` : ''}
+          ${p.rooms ? `<span class="prop-tag">🛏 ${p.rooms} кімн.</span>` : ''}
+          ${p.condition ? `<span class="prop-tag gold">${p.condition}</span>` : ''}
+          ${p.floor ? `<span class="prop-tag">🏢 ${p.floor}/${p.total_floors} пов.</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Відправка в бот ───────────────────────────────────────
+function sendToBot() {
+  const payload = JSON.stringify({
+    type: state.type,
+    city: state.city,
+    price_min: state.price_min,
+    price_max: state.price_max,
+    rooms: state.rooms,
+    area_min: state.area_min,
+    condition: state.condition,
+  });
+
+  if (tg) {
+    tg.sendData(payload);
+    tg.close();
+  } else {
+    alert('Фільтри: ' + payload);
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function formatNum(n) { return Number(n).toLocaleString('uk-UA'); }
+
+function typeLabel(t) {
+  const m = {apartment:'Квартири', house:'Будинки', land:'Ділянки', commercial:'Комерція'};
+  return m[t] || 'Всі типи';
+}
+function typeEmoji(t) {
+  const m = {apartment:'🏢', house:'🏠', land:'🌿', commercial:'🏪'};
+  return m[t] || '🏠';
+}
+
+function renderSkeletons(n) {
+  return Array(n).fill(0).map(() => `
+    <div class="prop-card">
+      <div class="skeleton" style="height:200px;border-radius:0"></div>
+      <div class="prop-body">
+        <div class="skeleton" style="height:24px;width:60%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:16px;width:80%;margin-bottom:12px"></div>
+        <div class="skeleton" style="height:12px;width:40%"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function getDemoProps() {
+  return [
+    {id:1, title:'2-кімнатна на Салтівці', type:'apartment', price:45000, city:'Харків', district:'Салтівка', area:52, rooms:2, floor:5, total_floors:9, condition:'Хороший', photo:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600'},
+    {id:2, title:'Будинок з садом', type:'house', price:95000, city:'Харків', district:'Харківський р-н', area:120, rooms:4, condition:'Відмінний', photo:'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600'},
+    {id:3, title:'Студія в центрі', type:'apartment', price:38000, city:'Харків', district:'Центр', area:35, rooms:1, floor:8, total_floors:12, condition:'Євроремонт', photo:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'},
+  ];
+}
+
+// ── Init ──────────────────────────────────────────────────
+updateBtn();
+if (tg && tg.themeParams?.bg_color) {
+  document.documentElement.style.setProperty('--paper', tg.themeParams.bg_color);
+}
+</script>
+</body>
+</html>
