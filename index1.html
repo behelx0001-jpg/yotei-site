@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yotei Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c;
+    --surface: #1a1917;
+    --surface2: #242220;
+    --border: rgba(255,255,255,.08);
+    --text: #f0ede6;
+    --muted: #7a7570;
+    --accent: #c9a84c;
+    --green: #2d6a4f;
+    --green-l: #52b788;
+    --red: #c1121f;
+    --red-l: #ff6b6b;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── LOGIN ── */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+  .login-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .login-sub { font-size: 12px; color: var(--muted); margin-bottom: 32px; letter-spacing: 1px; text-transform: uppercase; }
+  .login-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border .2s;
+  }
+  .login-input:focus { border-color: var(--accent); }
+  .login-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0f0e0c;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .login-btn:hover { opacity: .9; }
+  .login-err { color: var(--red-l); font-size: 13px; margin-top: 10px; display: none; }
+
+  /* ── APP ── */
+  #app { display: none; }
+
+  /* ── SIDEBAR ── */
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .sidebar-logo span { display: block; font-size: 10px; color: var(--muted); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 2px 8px;
+    transition: all .2s;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--surface2); color: var(--accent); }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  /* ── MAIN ── */
+  .main { margin-left: 220px; padding: 32px; flex: 1; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  /* ── STAT CARDS ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+  .stat-val { font-family: 'Unbounded', sans-serif; font-size: 28px; font-weight: 700; color: var(--accent); }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-title { font-size: 15px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    padding: 12px 20px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 14px 20px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .badge-green { background: rgba(82,183,136,.15); color: var(--green-l); }
+  .badge-red { background: rgba(255,107,107,.12); color: var(--red-l); }
+
+  /* ── BTN ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .15s;
+    font-family: 'Manrope', sans-serif;
+  }
+  .btn-accent { background: var(--accent); color: #0f0e0c; }
+  .btn-accent:hover { opacity: .9; }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-danger { background: rgba(193,18,31,.15); color: var(--red-l); }
+  .btn-danger:hover { background: rgba(193,18,31,.25); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label { font-size: 11px; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); }
+  .form-input, .form-select, .form-textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+
+  .prop-thumb {
+    width: 56px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 9999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s;
+    min-width: 220px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.err { border-left-color: var(--red-l); }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">YOTEI</div>
+    <div class="login-sub">Адмін-панель</div>
+    <input class="login-input" type="password" id="pwdInput" placeholder="Введіть пароль" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Увійти</button>
+    <div class="login-err" id="loginErr">Невірний пароль</div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app">
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-logo">YOTEI<span>Admin</span></div>
+      <div class="nav-item active" onclick="showPage('dashboard', this)">
+        <span class="nav-icon">📊</span> Дашборд
+      </div>
+      <div class="nav-item" onclick="showPage('properties', this)">
+        <span class="nav-icon">🏠</span> Об'єкти
+      </div>
+      <div style="margin-top:auto; padding: 16px 20px; font-size:11px; color:var(--muted)">
+        © 2024 Yotei
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">Дашборд</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Активні об'єкти</div>
+            <div class="stat-val" id="statProps">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Користувачі</div>
+            <div class="stat-val" id="statUsers">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Вподобання</div>
+            <div class="stat-val" id="statLiked">—</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">Останні об'єкти</div>
+            <button class="btn btn-accent" onclick="openModal()">+ Додати</button>
+          </div>
+          <table id="dashTable">
+            <thead><tr><th>Фото</th><th>Назва</th><th>Ціна</th><th>Місто</th></tr></thead>
+            <tbody id="dashTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PROPERTIES -->
+      <div class="page" id="page-properties">
+        <div class="page-title">Об'єкти нерухомості</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">Всі об'єкти</div>
+            <button class="btn btn-accent" onclick="openModal()">+ Додати</button>
+          </div>
+          <table>
+            <thead><tr><th>Фото</th><th>Назва</th><th>Тип</th><th>Ціна</th><th>Місто</th><th>Дії</th></tr></thead>
+            <tbody id="propsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">Новий об'єкт</div>
+    <input type="hidden" id="editId">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Назва *</label>
+        <input class="form-input" id="fTitle" placeholder="2-кімнатна квартира">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Тип</label>
+        <select class="form-select" id="fType">
+          <option value="apartment">Квартира</option>
+          <option value="house">Будинок</option>
+          <option value="land">Ділянка</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ціна ($) *</label>
+        <input class="form-input" type="number" id="fPrice">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Місто *</label>
+        <input class="form-input" id="fCity">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Район</label>
+        <input class="form-input" id="fDistrict">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Площа</label>
+        <input class="form-input" type="number" id="fArea">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Кімнат</label>
+        <input class="form-input" type="number" id="fRooms">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Поверх</label>
+        <input class="form-input" type="number" id="fFloor">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Фото (URL)</label>
+        <input class="form-input" id="fPhoto">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Скасувати</button>
+      <button class="btn btn-accent" onclick="saveProp()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "http://localhost:8000";
+let authToken = null;
+
+function doLogin() {
+  const pwd = document.getElementById('pwdInput').value;
+  if (!pwd) return alert('Введіть пароль');
+  
+  fetch(`${API}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) {
+      authToken = data.token;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      loadDashboard();
+    } else {
+      document.getElementById('loginErr').style.display = 'block';
+    }
+  })
+  .catch(e => alert('Помилка: ' + e));
+}
+
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  
+  if (name === 'dashboard') loadDashboard();
+  else if (name === 'properties') loadProperties();
+}
+
+async function loadDashboard() {
+  try {
+    const res = await fetch(`${API}/stats`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+    document.getElementById('statProps').textContent = data.properties || 0;
+    document.getElementById('statUsers').textContent = data.users || 0;
+    document.getElementById('statLiked').textContent = data.liked || 0;
+    
+    const props = await fetch(`${API}/properties`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    }).then(r => r.json());
+    
+    const html = props.slice(0, 5).map(p => `
+      <tr>
+        <td><img class="prop-thumb" src="${p.photo || ''}" alt=""></td>
+        <td>${p.title}</td>
+        <td>$${p.price}</td>
+        <td>${p.city}</td>
+      </tr>
+    `).join('');
+    document.getElementById('dashTbody').innerHTML = html;
+  } catch (e) {
+    showToast('Помилка загрузки', true);
+  }
+}
+
+async function loadProperties() {
+  try {
+    const props = await fetch(`${API}/properties`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    }).then(r => r.json());
+    
+    const html = props.map(p => `
+      <tr>
+        <td><img class="prop-thumb" src="${p.photo || ''}" alt=""></td>
+        <td>${p.title}</td>
+        <td>${p.type}</td>
+        <td>$${p.price}</td>
+        <td>${p.city}</td>
+        <td>
+          <button class="btn btn-ghost btn-sm" onclick="editProp(${p.id});">Редагувати</button>
+          <button class="btn btn-danger btn-sm" onclick="delProp(${p.id});">Видалити</button>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('propsTbody').innerHTML = html;
+  } catch (e) {
+    showToast('Помилка загрузки', true);
+  }
+}
+
+function openModal() {
+  document.getElementById('editId').value = '';
+  document.querySelectorAll('.form-input').forEach(f => f.value = '');
+  document.querySelectorAll('.form-select').forEach(f => f.value = 'apartment');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function saveProp() {
+  const data = {
+    title: document.getElementById('fTitle').value,
+    type: document.getElementById('fType').value,
+    price: parseInt(document.getElementById('fPrice').value) || 0,
+    city: document.getElementById('fCity').value,
+    district: document.getElementById('fDistrict').value,
+    area: parseFloat(document.getElementById('fArea').value) || null,
+    rooms: parseInt(document.getElementById('fRooms').value) || null,
+    floor: parseInt(document.getElementById('fFloor').value) || null,
+    photo: document.getElementById('fPhoto').value,
+  };
+  
+  if (!data.title || !data.price || !data.city) {
+    showToast('Заповніть обов\'язкові поля', true);
+    return;
+  }
+  
+  const url = `${API}/properties`;
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`
+    },
+    body: JSON.stringify(data)
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.ok) {
+      showToast('Об\'єкт створено');
+      closeModal();
+      loadProperties();
+      loadDashboard();
+    }
+  })
+  .catch(e => showToast('Помилка', true));
+}
+
+function editProp(id) {
+  document.getElementById('editId').value = id;
+  openModal();
+}
+
+function delProp(id) {
+  if (!confirm('Видалити об\'єкт?')) return;
+  
+  fetch(`${API}/properties/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${authToken}` }
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.ok) {
+      showToast('Об\'єкт видалено');
+      loadProperties();
+      loadDashboard();
+    }
+  })
+  .catch(e => showToast('Помилка', true));
+}
+
+function showToast(msg, isErr = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.toggle('err', isErr);
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'modalOverlay') closeModal();
+});
+</script>
+
+</body>
+</html>
